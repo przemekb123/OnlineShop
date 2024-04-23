@@ -17,8 +17,6 @@ import java.util.List;
 @Controller
 public class OrderController {
 
-    //TODO: dodawanie i usuwanie koszyka jedynie na widkoku w javascript, a po kliknieciu
-    //finalizacji przenoszenie do kontrolera przez GET/POST t(tworzenie zamowienia w bazie danych)
 
     @Autowired
     private UserRepository userRepository;

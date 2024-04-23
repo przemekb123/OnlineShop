@@ -83,8 +83,7 @@ public class UserController {
 
         return "redirect:/login";
 
-        //TODO Wprowadzic walidacje danych i wyswietlanie blednych pol
-        //TODO Dodaj obsluge ról uzytkownikow
+
     }
 
 

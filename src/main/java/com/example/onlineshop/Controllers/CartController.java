@@ -15,12 +15,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
+
 
 @Controller
 public class CartController {
@@ -45,12 +42,12 @@ public class CartController {
         String userName = (String) session.getAttribute("username");
 
         User loggedInUser = userRepository.findByUsername(userName);
-/*
+
         if (loggedInUser == null) {
             return "redirect:/login";
         }
 
- */
+
 
 
         Orders order = new Orders();

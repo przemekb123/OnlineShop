@@ -34,7 +34,6 @@ public class ProductsService {
     @Transactional
     public static void addProduct(ProductsAddForm productsAddForm){
 
-        // TODO: Walidacja
         MultipartFile image = productsAddForm.getImage();
         Products product = new Products();
 

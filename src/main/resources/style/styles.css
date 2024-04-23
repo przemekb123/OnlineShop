@@ -1,0 +1,34 @@
+
+.user-panel {
+    display: none;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    z-index: 999;
+}
+
+.user-panel ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.user-panel ul li {
+    margin-bottom: 10px;
+}
+
+.user-panel ul li a {
+    text-decoration: none;
+    color: #333;
+}
+
+.account-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+.account-icon:hover .user-panel {
+    display: block;
+}

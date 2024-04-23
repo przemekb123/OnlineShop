@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Cart</title>
+</head>
+<body>
+<h1>Shopping Cart</h1>
+<table>
+  <thead>
+  <tr>
+    <th>Product Name</th>
+    <th>Quantity</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="entry : ${cart}">
+    <td th:text="${entry.key.toString()}">Product Name</td>
+    <td th:text="${entry.value}">Quantity</td>
+  </tr>
+  </tbody>
+</table>
+</body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:c="http://www.w3.org/1999/XSL/Transform" xmlns:width="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shop</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .material-symbols-rounded {
+            font-variation-settings:
+                    'FILL' 0,
+                    'wght' 400,
+                    'GRAD' 0,
+                    'opsz' 40
+        }
+
+        .shopping-bag{
+            padding: 0 20px;
+        }
+
+        .navbar-form {
+            display: flex;
+            align-items: center;
+        }
+
+        .logout-btn,
+        .login-btn {
+            margin-bottom: 0;
+            margin-left: 10px;
+        }
+        .search-box {
+            position: relative;
+            margin-right: 20%;
+
+        }
+        .search-input {
+            padding-right: 40px;
+            border-radius: 20px;
+            width: 400px;
+            text-align: left;
+        }
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            color: #aaa;
+            cursor: pointer;
+        }
+        .admin{
+            color:red;
+            margin-left:10px;
+            display: block;
+            font-size: 13px;
+            margin-top: -8px;
+        }
+        .card-img-top {
+            width: 200px;
+            height: 250px;
+            margin:20px;
+            border-radius: 5px;
+        }
+        .card {
+            margin-top: 20px;
+        }
+        .smaller-text {
+            font-size: 12px; /* Możesz dostosować wielkość czcionki według własnych preferencji */
+        }
+        .cart-popup {
+            position: fixed;
+            top: 60px;
+            right: 80px;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 10px;
+            display: none;
+            z-index: 999;
+            border-radius: 10px;
+            margin: 5px;
+        }
+
+
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Logo</a>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Strona główna <span class="sr-only">(current)</span></a>
+            </li>
+            <div th:if="${session['AdminPermission'] != null}">
+            <li class="nav-item">
+                <a class="nav-link" href="/addProduct">Dodaj Produkt</a>
+            </li>
+            </div>
+        </ul>
+        <!--
+        <div class="search-box">
+            <input type="text" class="form-control search-input" placeholder="Wyszukaj produkt">
+            <i class="material-icons search-icon">search</i>
+        </div>
+        TODO: DODAJ POLE DO WYSZUKIWANIA NA SRODKU STRONY TAK JAK NA ALIEEXPRESS
+        -->
+        <form class="form-inline my-2 my-lg-0 navbar-form">
+            <!-- Tutaj umieść logikę, która sprawdza, czy użytkownik jest zalogowany i wyświetla odpowiedni przycisk lub nazwę użytkownika -->
+            <div th:if="${session['loggedInUser'] != null}" class="d-flex align-items-center">
+                <div class="d-flex flex-column">
+
+                <span class="navbar-text mr-2" th:text="'Witaj, ' + ${session['username']} + '!'"></span>
+                    <div th:if="${session['AdminPermission'] != null}" class="admin">
+                    <span>Administrator</span>
+                    </div>
+                </div>
+                <span class="material-symbols-rounded shopping-bag" id="shoppingBagIcon">shopping_bag</span>
+                <div class="cart-popup" id="cartPopup">
+
+                    <p id="emptyCartMessage">Twój koszyk jest pusty.</p>
+                    <button id="checkoutButton" class="btn btn-success mx-auto">Checkout</button>
+
+                </div>
+
+
+                <a class="btn btn-outline-danger my-2 my-sm-0 logout-btn" href="/logout">Wyloguj się</a>
+            </div>
+            <div th:if="${session['loggedInUser'] == null}" class="d-flex align-items-center">
+                <span class="material-symbols-rounded shopping-bag" id="shoppingBagIcon">shopping_bag</span>
+                <div class="cart-popup" id="cartPopup">
+
+                    <p id="emptyCartMessage">Twój koszyk jest pusty.</p>
+                    <button id="checkoutButton3" class="btn btn-success">Checkout</button>
+
+                </div>
+
+                <a class="btn btn-outline-success my-2 my-sm-0 login-btn" href="/login">Zaloguj się</a>
+            </div>
+        </form>
+    </div>
+</nav>
+<main>
+    <div class="container-sm mb-5">
+        <div class="row">
+            <div th:each="product : ${products}" class="col-md-3 mb-4">
+                <div class="card">
+                    <img th:src="'data:image/gif;base64,' + ${product.base64ImageData}" class="card-img-top" alt="Product Image">
+                    <div class="card-body">
+                        <h5 class="card-title text-center mb-3" th:text="${product.name}"></h5> <!-- Nazwa produktu wysrodkowana -->
+                        <hr style="border-top: 1px solid #ccc; margin: 5px 0;"> <!-- Cienka szara kreska -->
+
+                        <!-- Cena produktu -->
+                        <p class="card-text text-center" th:text="'Price: $' + ${product.price}"></p>
+
+                        <!-- Pole do wprowadzania ilości produktu i przycisk "Add to Cart" -->
+                        <div class="row align-items-center justify-content-center">
+                            <div class="col">
+                                <input type="number" class="form-control" id="quantityInput" min="1" value="1">
+                            </div>
+
+                            <div class="col-auto">
+                               <!-- <form th:action="@{/addToCart/{productId}(productId=${product.product_id})}" method="POST"> -->
+                                    <button class="btn btn-primary btn-sm addToCartBtn" th:data-product-id="${product.product_id}"  th:data-product-name="${product.name}">
+                                        Add to Cart
+                                    </button>
+                              <!--  </form> -->
+                            </div>
+                        </div>
+                        <!-- jesli uzytkownik ma role admin przyciski delete i edit -->
+                        <div th:if="${session['AdminPermission'] != null}">
+                            <div class="row align-items-center justify-content-center mt-3 ">
+                                <button class="btn btn-success btn-sm smaller-text" th:onclick="'showDiscountModal(' + ${product.product_id} + ')'">Discount</button>
+
+                                <div class="modal" id="discountModal">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+
+                                            <div class="modal-header">
+                                                <h4 class="modal-title">Set Discount</h4>
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                                <label for="discountPrice">Enter Discounted Price:</label>
+                                                <input type="number" class="form-control" id="discountPrice">
+                                                <input type="hidden" id="productId" th:value="${product.getProduct_id()}">
+                                            </div>
+
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary" onclick="applyDiscount()">Apply Discount</button>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-auto">
+                                    <button class="btn btn-warning btn-sm" th:onclick="'showModifyModal(' + ${product.product_id} + ')'">Modify</button>
+                                    <div class="modal" id="modifyModal">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+
+                                                <div class="modal-header">
+                                                    <h4 class="modal-title">Modify Product</h4>
+                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <form id="modifyForm">
+                                                        <div class="form-group">
+                                                            <label for="productName">Product Name:</label>
+                                                            <input type="text" class="form-control" id="productName" th:value="${product.name}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label for="productDescription">Product Description:</label>
+                                                            <textarea class="form-control" id="productDescription" rows="3" th:text="${product.description}"></textarea>
+                                                        </div>
+                                                    </form>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                    <button type="button" class="btn btn-primary" onclick="saveChanges()">Save Changes</button>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+                                    <form th:action="@{/delete/{id}(id=${product.getProduct_id()})}" method="POST">
+                                        <input type="hidden" name="_method" value="DELETE">
+                                        <button class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+function showDiscountModal(productId) {
+    $('#discountModal').modal('show');
+    $('#productId').val(productId);
+}
+function applyDiscount() {
+
+
+    var discountedPrice = $('#discountPrice').val();
+    var productId = $('#productId').val();
+
+    $.ajax({
+        type: "POST",
+        url: "/discount/" + productId,
+        data: { discountedPrice: discountedPrice },
+        success: function (response) {
+            window.location.href = "/";
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+
+
+function showModifyModal(productId) {
+    $('#modifyModal').modal('show');
+    $('#productId').val(productId);
+}
+
+function saveChanges() {
+    var productId = $('#productId').val();
+    var newName = $('#productName').val();
+    var newDescription = $('#productDescription').val();
+
+    $.ajax({
+        type: "POST",
+        url: "/edit/" + productId,
+        data: {
+            name: newName,
+            description: newDescription
+        },
+        success: function (response) {
+            $('#modifyModal').modal('hide');
+            location.reload();
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+        }
+    });
+}
+
+
+</script>
+<script>
+
+    let isMouseOverIcon = false;
+    let isMouseOverPopup = false;
+
+    const shoppingBagIcon = document.getElementById('shoppingBagIcon');
+    const cartPopup = document.getElementById('cartPopup');
+    const productsMap = new Map();
+
+    shoppingBagIcon.addEventListener('mouseenter', () => {
+        isMouseOverIcon = true;
+        showCartPopup();
+    });
+
+    shoppingBagIcon.addEventListener('mouseleave', () => {
+        isMouseOverIcon = false;
+        if (!isMouseOverPopup) {
+            hideCartPopup();
+        }
+    });
+
+    cartPopup.addEventListener('mouseenter', () => {
+        isMouseOverPopup = true;
+        showCartPopup();
+    });
+
+    cartPopup.addEventListener('mouseleave', () => {
+        isMouseOverPopup = false;
+        if (!isMouseOverIcon) {
+            hideCartPopup();
+        }
+    });
+    function showCartPopup() {
+        const cartPopup = document.getElementById('cartPopup');
+        cartPopup.style.display = 'block';
+    }
+
+    function hideCartPopup() {
+        setTimeout(() => {
+            const cartPopup = document.getElementById('cartPopup');
+            if (!isMouseOverPopup && !isMouseOverIcon) {
+                cartPopup.style.display = 'none';
+            }
+        }, 500);
+
+    }
+
+    const addToCartButtons = document.querySelectorAll('.addToCartBtn');
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const productId = button.getAttribute('data-product-id');
+            const productName = button.getAttribute('data-product-name');
+            const quantityInput = button.parentElement.previousElementSibling.querySelector('.form-control');
+            const quantity = quantityInput.value;
+
+
+
+            addToCart(productId, productName, quantity);
+        });
+    });
+
+
+
+
+    function addToCart(productId, productName, quantity) {
+        const cartPopup = document.getElementById('cartPopup');
+        const cartContent = cartPopup.innerHTML;
+
+
+        if (cartContent.includes(productName)) {
+            //aktualizacja ilosci produktu jesli produkt jest juz w koszyku
+            const regex = new RegExp(`${productName}: (\\d+)`);
+            const newQuantity = parseInt(quantity) + parseInt(cartContent.match(regex)[1]);
+            cartPopup.innerHTML = cartContent.replace(regex, `${productName}: ${newQuantity}`);
+            productsMap.set(productName,newQuantity);
+
+        } else {
+            cartPopup.innerHTML += `<p>${productName}: ${quantity}</p>`;
+            productsMap.set(productName,quantity);
+        }
+
+
+        showCartPopup();
+        const emptyCartMessage = document.getElementById('emptyCartMessage');
+        emptyCartMessage.style.display = 'none';
+
+
+        const checkoutButton = document.getElementById('checkoutButton');
+
+
+        checkoutButton.addEventListener('click', () => {
+            event.preventDefault();
+
+            $.ajax({
+                type: "POST",
+                url: `/addToCart`,
+                data: JSON.stringify(Object.fromEntries(productsMap)),
+                contentType: "application/json",
+                success: function (response) {
+                    console.log(response);
+                    window.location.href = "/checkout"
+                },
+                error: function (xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+
+
+
+        });
+
+        cartPopup.style.display = 'block';
+        emptyCartMessage.style.display = 'none';
+
+
+
+    }
+
+
+</script>
+</body>
+</html>

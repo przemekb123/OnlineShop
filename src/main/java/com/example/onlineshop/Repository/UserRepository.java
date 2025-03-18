@@ -1,8 +1,10 @@
 package com.example.onlineshop.Repository;
 
-import com.example.onlineshop.Models.Entity.User;
+import com.example.onlineshop.Model.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -20,6 +22,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u where u.user_id = :user_id")
     User findUserById(Integer user_id);
+
+    Optional<User> findByLogin(String login);
+
+
+    boolean existsByLogin(String login);
+
+    boolean existsByEmail(String email);
+
 
 
 }
